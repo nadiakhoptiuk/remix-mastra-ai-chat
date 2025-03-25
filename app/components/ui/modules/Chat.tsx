@@ -2,28 +2,23 @@ import type { Message } from "~/types/chat";
 import { ChatMessageList } from "~/components/ui/chat/chat-message-list";
 import { ChatInput } from "~/components/ui/chat/chat-input";
 import { Button } from "~/components/ui/button";
-import { Send, StopCircle } from "lucide-react";
+import { PaperPlaneIcon } from "@radix-ui/react-icons";
+import { useFetcher } from "@remix-run/react";
 
 export interface ChatProps {
   chatId?: string;
   messages: Message[];
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  isLoading: boolean;
-  error?: Error;
-  stop: () => void;
 }
 
 export default function Chat({ 
   messages, 
   input, 
-  handleInputChange, 
-  handleSubmit, 
-  isLoading, 
-  error, 
-  stop
+  handleInputChange,
 }: ChatProps) {
+  const fetcher = useFetcher();
+  
   return (
     <div className="flex flex-col justify-between w-full h-full">
       <div className="flex-1 overflow-hidden">
@@ -50,32 +45,17 @@ export default function Chat({
       </div>
 
       <div className="border-t p-4">
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <fetcher.Form method="post" className="flex gap-2">
           <ChatInput
             value={input}
             onChange={handleInputChange}
             placeholder="Type a message..."
-            disabled={isLoading}
           />
-          {isLoading ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={stop}
-              className="shrink-0"
-            >
-              <StopCircle className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button type="submit" size="icon" className="shrink-0" disabled={!input.trim()}>
-              <Send className="h-4 w-4" />
-            </Button>
-          )}
-        </form>
-        {error && (
-          <p className="text-sm text-destructive mt-2">{error.message}</p>
-        )}
+        
+          <Button type="submit" size="icon" className="shrink-0">
+            <PaperPlaneIcon className="h-4 w-4" />
+          </Button>  
+        </fetcher.Form>
       </div>
     </div>
   );

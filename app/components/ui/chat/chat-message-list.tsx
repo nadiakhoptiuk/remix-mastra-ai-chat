@@ -1,16 +1,17 @@
 import * as React from "react";
-import { ArrowDown } from "lucide-react";
+import { ArrowDownIcon } from "@radix-ui/react-icons";
 import { Button } from "~/components/ui/button";
+import { useState } from "react";
 
 interface ChatMessageListProps extends React.HTMLAttributes<HTMLDivElement> {
   smooth?: boolean;
 }
 
 const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
-  ({ className, children, smooth = false, ...props }, ref) => {
+  ({ className, children, smooth = false, ...props }, _ref) => {
     const scrollRef = React.useRef<HTMLDivElement>(null);
-    const [isAtBottom, setIsAtBottom] = React.useState(true);
-    const [autoScrollEnabled, setAutoScrollEnabled] = React.useState(true);
+    const [isAtBottom, setIsAtBottom] = useState(true);
+    const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
     const scrollToBottom = React.useCallback((smooth?: boolean) => {
       if (scrollRef.current) {
@@ -62,7 +63,7 @@ const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
             className="absolute bottom-2 left-1/2 transform -translate-x-1/2 inline-flex rounded-full shadow-md"
             aria-label="Scroll to bottom"
           >
-            <ArrowDown className="h-4 w-4" />
+            <ArrowDownIcon className="h-4 w-4" />
           </Button>
         )}
       </div>

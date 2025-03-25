@@ -2,6 +2,7 @@ import { Link } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { cn } from "~/lib/utils";
+import { useCallback } from "react";
 
 interface ChatSidebarProps {
   chats: {
@@ -13,16 +14,22 @@ interface ChatSidebarProps {
 }
 
 export function ChatSidebar({ chats, currentChatId }: ChatSidebarProps) {
+  const generateChatId = useCallback(() => {
+    return crypto.randomUUID();
+  }, []);
+
   return (
     <div className="w-80 border-r min-h-screen bg-muted/40">
       <div className="flex flex-col h-full">
+        
         <div className="px-4 py-3 border-b">
-          <Link to="/chat">
+          <Link to={`/chat/${generateChatId()}`}>
             <Button className="w-full" variant="outline">
               New Chat
             </Button>
           </Link>
         </div>
+
         <ScrollArea className="flex-1 px-2">
           <div className="space-y-2 py-2">
             {chats.map((chat) => (
