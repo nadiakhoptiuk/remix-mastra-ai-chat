@@ -2,28 +2,39 @@ import { Link } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { cn } from "~/lib/utils";
-import { useCallback } from "react";
+import { useMemo } from "react";
+import { memory } from "src/mastra/agents";
+import { formatRelative } from "date-fns";
 
 interface ChatSidebarProps {
   chats: {
     id: string;
-    firstPrompt: string;
+    title: string;
     createdAt: string;
   }[];
   currentChatId?: string;
 }
 
 export function ChatSidebar({ chats, currentChatId }: ChatSidebarProps) {
-  const generateChatId = useCallback(() => {
-    return crypto.randomUUID();
+  const generatedChatId = useMemo(() => {
+    return memory.generateId();
   }, []);
+
+  const threadsByDate = useMemo(() => {
+    return chats.map((chat) => {
+      return {
+        ...chat,
+        createdAt: formatRelative(new Date(chat.createdAt), new Date()),
+      };
+    });
+  }, [chats]);
 
   return (
     <div className="w-80 border-r min-h-screen bg-muted/40">
       <div className="flex flex-col h-full">
         
         <div className="px-4 py-3 border-b">
-          <Link to={`/chat/${generateChatId()}`}>
+          <Link to={`/chat/${generatedChatId}`}>
             <Button className="w-full" variant="outline">
               New Chat
             </Button>
@@ -32,11 +43,13 @@ export function ChatSidebar({ chats, currentChatId }: ChatSidebarProps) {
 
         <ScrollArea className="flex-1 px-2">
           <div className="space-y-2 py-2">
-            {chats.map((chat) => (
-              <Link 
-                key={chat.id} 
-                to={`/chat/${chat.id}`}
-                className="block"
+            {threadsByDate.map((chat) => (
+              <>
+                <p>{chat.createdAt}</p>
+                <Link 
+                  key={chat.id} 
+                  to={`/chat/${chat.id}`}
+                  className="block"
               >
                 <Button
                   variant="ghost"
@@ -45,14 +58,10 @@ export function ChatSidebar({ chats, currentChatId }: ChatSidebarProps) {
                     currentChatId === chat.id && "bg-accent"
                   )}
                 >
-                  <div className="flex flex-col items-start gap-1">
-                    <p className="line-clamp-1 text-sm">{chat.firstPrompt}</p>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(chat.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
+                  {chat.title}
                 </Button>
-              </Link>
+                </Link>
+              </>
             ))}
           </div>
         </ScrollArea>

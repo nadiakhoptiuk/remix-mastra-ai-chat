@@ -12,7 +12,7 @@ export const memory = new Memory({
   storage,
   options: {
     // Number of recent messages to include (false to disable)
-    lastMessages: 10,
+    lastMessages: 50,
     // Configure vector-based semantic search (false to disable)
     semanticRecall: {
       topK: 3, // Number of semantic search results

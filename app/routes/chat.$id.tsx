@@ -13,20 +13,19 @@ type LoaderData = {
 
 export async function loader({ params }: LoaderFunctionArgs): Promise<LoaderData> {
   // Here we'll use params.id when implementing chat loading
-  console.log("Loading chat:", params.id);
   const threadId = params.id;
 
   if(!threadId) {
-    return {
-      messages: []
-    };
+    throw redirect("/chat");
   }
 
-  const [existingThread] = await memory.getThreadsByResourceId({ resourceId: threadId });
-  
+  const existingThread = await memory.getThreadById({ threadId });
+  console.log("Existing thread: >>>", existingThread);
+
   if (!existingThread) {
     const newThread = await memory.createThread({
-      resourceId: threadId,
+      threadId: threadId,
+      resourceId: 'user-1',
       title: "Support Conversation",
       metadata: {
         category: "support", 
@@ -38,17 +37,15 @@ export async function loader({ params }: LoaderFunctionArgs): Promise<LoaderData
     };
   }
  
-  const { messages } = await memory.query({
+  const { uiMessages } = await memory.query({
   threadId: existingThread.id,
   selectBy: {
     last: 50,
     },
   });
-  
-  // console.log("Messages:", messages);
 
   return {
-    messages: messages
+    messages: uiMessages
   };
 }
 
@@ -60,7 +57,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     };
   }
 
-  const [existingThread] = await memory.getThreadsByResourceId({ resourceId: threadId });
+  const existingThread = await memory.getThreadById({ threadId });
 
   if(!existingThread) {
     return redirect("/chat");
@@ -71,12 +68,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   await memory.addMessage({
     threadId: existingThread.id,
-    content: input as string,
+    content: [{type: "text", text: input as string}],
     role: "user",
     type: "text",
   });
 
-  const response = await executeWeatherAgent(input as string);
+  const response = await executeWeatherAgent(input as string, existingThread.id, 'user-1');
   await memory.addMessage({
     threadId: existingThread.id,
     content: response.content,
