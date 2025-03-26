@@ -26,9 +26,18 @@ export async function loader({ params }: LoaderFunctionArgs): Promise<LoaderData
     const newThread = await memory.createThread({
       threadId: threadId,
       resourceId: 'user-1',
-      title: "Support Conversation",
+      title: "Draft",
       metadata: {
         category: "support", 
+      }
+    });
+
+    await memory.saveThread({
+      thread: newThread,
+      memoryConfig: {
+        threads: {
+          generateTitle: true,
+        }
       }
     });
     console.log("New thread: >>>", newThread);

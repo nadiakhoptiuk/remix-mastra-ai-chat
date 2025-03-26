@@ -1,7 +1,6 @@
 import { Link } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { cn } from "~/lib/utils";
 import { useMemo } from "react";
 import { memory } from "src/mastra/agents";
 import { formatRelative } from "date-fns";
@@ -42,26 +41,21 @@ export function ChatSidebar({ chats, currentChatId }: ChatSidebarProps) {
         </div>
 
         <ScrollArea className="flex-1 px-2">
-          <div className="space-y-2 py-2">
+          <h2 className="text-lg font-semibold mb-5">Chats</h2>
+
+          <div className="space-y-4 py-2">
             {threadsByDate.map((chat) => (
-              <>
-                <p>{chat.createdAt}</p>
-                <Link 
-                  key={chat.id} 
-                  to={`/chat/${chat.id}`}
-                  className="block"
-              >
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start text-left h-auto py-3",
-                    currentChatId === chat.id && "bg-accent"
-                  )}
-                >
-                  {chat.title}
-                </Button>
-                </Link>
-              </>
+                <div key={chat.id} className="space-y-2">
+                  <p className="text-xs text-muted-foreground">{chat.createdAt}</p>
+
+                    {chat.id !== currentChatId ? <Link
+                    key={chat.id}
+                    to={`/chat/${chat.id}`}
+                    className="block text-sm p-2 bg-gray-700 hover:bg-gray-600 focus:bg-gray-600 rounded-md"
+                  >
+                    {chat.title}
+                  </Link> : <p className="block text-sm p-2 bg-transparent border border-gray-700 rounded-md">{chat.title}</p>}
+                </div>
             ))}
           </div>
         </ScrollArea>
