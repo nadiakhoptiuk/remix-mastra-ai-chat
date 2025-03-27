@@ -62,27 +62,27 @@ export async function executeWeatherAgent(input: string, threadId: string, resou
     const controller = agentExecutionManager.createController(threadId);
     
     // Use the stream method to demonstrate longer running process that can be aborted
-    const stream = await weatherAgent.stream('', {
+    const response = await weatherAgent.generate('', {
       threadId: threadId,
       resourceId: resourceId,
       abortSignal: controller.signal,
     });
     
     // Collect the full response
-    let fullResponse = '';
-    try {
-      for await (const chunk of stream.textStream) {
-        fullResponse += chunk;
-        // In a real app, you might want to send each chunk to the client
-        // This is just for demonstration purposes
-      }
-    } catch (error) {
-      // Check if this was aborted
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        throw error; // Re-throw to be caught by outer catch block
-      }
-      console.error('Error during streaming:', error);
-    }
+    // let fullResponse = '';
+    // try {
+    //   for await (const chunk of stream.textStream) {
+    //     fullResponse += chunk;
+    //     // In a real app, you might want to send each chunk to the client
+    //     // This is just for demonstration purposes
+    //   }
+    // } catch (error) {
+    //   // Check if this was aborted
+    //   if (error instanceof DOMException && error.name === 'AbortError') {
+    //     throw error; // Re-throw to be caught by outer catch block
+    //   }
+    //   console.error('Error during streaming:', error);
+    // }
     
     // If we completed successfully, remove the controller
     agentExecutionManager.abortExecution(threadId);
@@ -90,7 +90,7 @@ export async function executeWeatherAgent(input: string, threadId: string, resou
     return {
       id: memory.generateId(),
       role: 'assistant',
-      content: fullResponse || 'No response generated',
+      content: response.text || 'No response generated',
       createdAt: new Date().toISOString(),
     };
   } catch (error) {

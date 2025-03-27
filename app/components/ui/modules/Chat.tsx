@@ -3,7 +3,7 @@ import { ChatMessageList } from "~/components/ui/chat/chat-message-list";
 import { ChatInput } from "~/components/ui/chat/chat-input";
 import { Button } from "~/components/ui/button";
 import { PaperPlaneIcon, StopIcon } from "@radix-ui/react-icons";
-import { useFetcher, useRevalidator } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { useEffect, useState, useRef } from "react";
 
 export interface ChatProps {
@@ -21,8 +21,7 @@ export default function Chat({
   const [input, setInput] = useState("");
   const isSubmitting = fetcher.state === "submitting";
   const lastMessageRef = useRef<string | null>(null);
-  const [firstRender, setFirstRender] = useState(true);
-  const { revalidate } = useRevalidator();  
+  const [firstRender, setFirstRender] = useState(true); 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
@@ -46,7 +45,7 @@ export default function Chat({
     setInput("");
   };
 
-  // Function to abort the agent execution
+  //Function to abort the agent execution
   const handleAbort = () => {
     abortFetcher.submit(
       {}, // No form data needed
