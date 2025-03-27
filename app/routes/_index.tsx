@@ -44,8 +44,6 @@ export async function loader() {
       last: 50,
     },
   });
-
-  console.log("messages from Mastra:", messages);
   
   // Convert and filter the messages to our app's Message format
   const filteredMessages = messages
@@ -116,6 +114,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const userId = formData.get("userId");
   const action = formData.get("action");
 
+
+  let response = null;
   switch (action) {
     case "saveUserInquiry":
       await saveUserInquiry(input as string, threadId as string);
@@ -123,7 +123,8 @@ export async function action({ request }: ActionFunctionArgs) {
     
     case "executeAgent":
       console.log("executeAgent");
-      await agentResponseAction(input as string, threadId as string, userId as string);  
+      response = await agentResponseAction(input as string, threadId as string, userId as string);  
+      console.log("response in ACTION >>>", response);
       break; 
   }
 
