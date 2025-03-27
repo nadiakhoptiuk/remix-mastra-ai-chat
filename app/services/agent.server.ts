@@ -68,22 +68,6 @@ export async function executeWeatherAgent(input: string, threadId: string, resou
       abortSignal: controller.signal,
     });
     
-    // Collect the full response
-    // let fullResponse = '';
-    // try {
-    //   for await (const chunk of stream.textStream) {
-    //     fullResponse += chunk;
-    //     // In a real app, you might want to send each chunk to the client
-    //     // This is just for demonstration purposes
-    //   }
-    // } catch (error) {
-    //   // Check if this was aborted
-    //   if (error instanceof DOMException && error.name === 'AbortError') {
-    //     throw error; // Re-throw to be caught by outer catch block
-    //   }
-    //   console.error('Error during streaming:', error);
-    // }
-    
     // If we completed successfully, remove the controller
     agentExecutionManager.abortExecution(threadId);
     
