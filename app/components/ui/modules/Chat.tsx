@@ -4,7 +4,7 @@ import { ChatInput } from "~/components/ui/chat/chat-input";
 import { Button } from "~/components/ui/button";
 import { PaperPlaneIcon, StopIcon } from "@radix-ui/react-icons";
 import { useFetcher } from "@remix-run/react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 export interface ChatProps {
   chatId?: string;
@@ -20,30 +20,38 @@ export default function Chat({
   const abortFetcher = useFetcher();
   const [input, setInput] = useState("");
   const isSubmitting = fetcher.state === "submitting";
-  const lastMessageRef = useRef<string | null>(null);
-  const [firstRender, setFirstRender] = useState(true); 
+  const [shownMessages, setShownMessages] = useState(messages);
+
+   useEffect(() => {
+    // Update shownMessages when prop messages change
+    setShownMessages(messages);
+  }, [messages]);
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
   };
 
+
   // Handle form submission manually to ensure proper clearing and prevent default
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim()) return;
     
     // Create form data manually
     const formData = new FormData();
     formData.append("input", input);
-    formData.append("action", "saveUserInquiry"); 
     formData.append("threadId", threadId);
-    
+    formData.append("userId", userId);
+
+    // Clear input after submission
+    setShownMessages([...shownMessages, { id: 'new', content: input, role: 'user', createdAt: new Date() }]);
+    setInput("");
+
     // Submit the form
     fetcher.submit(formData, { method: "post" });
-    
-    // Clear input after submission
-    setInput("");
   };
+
 
   //Function to abort the agent execution
   const handleAbort = () => {
@@ -55,44 +63,12 @@ export default function Chat({
       }
     );
   };
-
-  useEffect(() => {
-    // Skip if submitting or no messages
-    if (isSubmitting || messages.length === 0 || firstRender) {
-      setFirstRender(false);
-      return;
-    }
-
-    const lastMessage = messages[messages.length - 1];
-    
-    // Only trigger agent if:
-    // 1. Last message is from user
-    // 2. It's a new message (not the same as before)
-    // 3. We're in idle state
-    if (
-      fetcher.state === "idle" && 
-      lastMessage.role === "user" && 
-      lastMessage.id !== lastMessageRef.current
-    ) {
-      // Update ref to current message ID to prevent retriggering
-      lastMessageRef.current = lastMessage.id;
-      console.log("Generating response, MESSAGES:", messages);
-      
-      // Submit agent action
-      fetcher.submit({ 
-        action: "executeAgent", 
-        input: lastMessage.content, 
-        threadId, 
-        userId ,
-      }, { method: "post" })
-    }
-  }, [messages, fetcher.state, isSubmitting, threadId, userId]);
   
   return (
     <div className="flex flex-col justify-between w-full h-screen">
       <div className="flex-1 overflow-hidden">
         <ChatMessageList>
-          {messages.map((message) => (
+          {shownMessages.map((message) => (
             <div
               key={message.id}
               className={`flex ${

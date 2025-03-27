@@ -62,7 +62,10 @@ export async function executeWeatherAgent(input: string, threadId: string, resou
     const controller = agentExecutionManager.createController(threadId);
     
     // Use the stream method to demonstrate longer running process that can be aborted
-    const response = await weatherAgent.generate('', {
+    const response = await weatherAgent.generate([{
+      role: 'user',
+      content: input 
+    }], {
       threadId: threadId,
       resourceId: resourceId,
       abortSignal: controller.signal,

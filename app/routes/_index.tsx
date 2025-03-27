@@ -2,16 +2,11 @@ import { ActionFunctionArgs } from "@remix-run/node";
 import { redirect, useLoaderData } from "@remix-run/react";
 import { memory } from "src/mastra/agents";
 import Chat from "~/components/ui/modules/Chat";
-import { saveUserInquiry } from "~/services/saveUserInquiry";
 import { agentResponseAction } from "~/services/agentResponseAction";
 import { Message } from "~/types/chat";
 
 export async function loader() {
   const threadId = "123";
-
-  if(!threadId) {
-    throw redirect("/chat");
-  }
 
   const existingThread = await memory.getThreadById({ threadId });
 
@@ -53,17 +48,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const input = formData.get("input");
   const threadId = formData.get("threadId");
   const userId = formData.get("userId");
-  const action = formData.get("action");
-
-  switch (action) {
-    case "saveUserInquiry":
-      await saveUserInquiry(input as string, threadId as string);
-      break;
     
-    case "executeAgent":
-      await agentResponseAction(input as string, threadId as string, userId as string);
-      break; 
-  }
+  await agentResponseAction(input as string, threadId as string, userId as string);
 
   return {
     success: true,
