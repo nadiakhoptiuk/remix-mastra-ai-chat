@@ -32,14 +32,6 @@ export async function loader({ params }: LoaderFunctionArgs): Promise<LoaderData
       }
     });
 
-    await memory.saveThread({
-      thread: newThread,
-      memoryConfig: {
-        threads: {
-          generateTitle: true,
-        }
-      }
-    });
     console.log("New thread: >>>", newThread);
     return {
       messages: []
@@ -96,11 +88,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function ChatPage() {
   const { messages } = useLoaderData<typeof loader>();
   const { id } = useParams();
-  const [input, setInput] = useState("");
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value);
-  };
 
   return (
     <div className="flex min-h-screen">
@@ -108,8 +95,6 @@ export default function ChatPage() {
         <Chat
           chatId={id}
           messages={messages}
-          input={input}
-          handleInputChange={handleInputChange}
         />
       </div>
     </div>

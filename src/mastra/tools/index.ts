@@ -35,14 +35,14 @@ export const weatherTool = createTool({
     conditions: z.string(),
     location: z.string(),
   }),
-  execute: async ({ context }) => {
-    return await getWeather(context.location);
+  execute: async ({ context }, options) => {
+    return await getWeather(context.location, options?.abortSignal);
   },
 });
 
-const getWeather = async (location: string) => {
+const getWeather = async (location: string, abortSignal?: AbortSignal) => {
   const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`;
-  const geocodingResponse = await fetch(geocodingUrl);
+  const geocodingResponse = await fetch(geocodingUrl, { signal: abortSignal });
   const geocodingData = (await geocodingResponse.json()) as GeocodingResponse;
 
   if (!geocodingData.results?.[0]) {
@@ -53,7 +53,7 @@ const getWeather = async (location: string) => {
 
   const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,weather_code`;
 
-  const response = await fetch(weatherUrl);
+  const response = await fetch(weatherUrl, { signal: abortSignal });
   const data = (await response.json()) as WeatherResponse;
 
   return {
