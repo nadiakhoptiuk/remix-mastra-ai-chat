@@ -1,6 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect, useLoaderData, useParams } from "@remix-run/react";
-import { useState } from "react";
 import { Memory } from "@mastra/memory";
 import Chat from "~/components/ui/modules/Chat";
 import type { Message } from "~/types/chat";
